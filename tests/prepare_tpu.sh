@@ -1,0 +1,2 @@
+export TPU_IP_ADDRESS=10.20.106.58
+export XRT_TPU_CONFIG='tpu_worker;0;10.20.106.58:8470'

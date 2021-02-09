@@ -1,0 +1,1036 @@
+Traceback (most recent call last):
+  File "test_tpu.py", line 205, in <module>
+    test_multiple_tpu_mnist()
+  File "test_tpu.py", line 200, in test_multiple_tpu_mnist
+    start_method='fork')
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 383, in spawn
+    return _run_direct(fn, args, nprocs, join, daemon, start_method)
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 347, in _run_direct
+    fn, args=args, nprocs=nprocs, join=join, daemon=daemon)
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch/multiprocessing/spawn.py", line 199, in spawn
+    return start_processes(fn, args, nprocs, join, daemon, start_method='spawn')
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch/multiprocessing/spawn.py", line 157, in start_processes
+    while not context.join():
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch/multiprocessing/spawn.py", line 118, in join
+    raise Exception(msg)
+Exception:
+
+-- Process 7 terminated with the following error:
+Traceback (most recent call last):
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch/multiprocessing/spawn.py", line 19, in _wrap
+    fn(i, *args)
+  File "/home/jungsublim/torch-playground/once-for-all/tests/test_tpu.py", line 190, in _mp_fn
+    accuracy, data, pred, target = train_mnist()
+  File "/home/jungsublim/torch-playground/once-for-all/tests/test_tpu.py", line 134, in train_mnist
+    device = xm.xla_device()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 231, in xla_device
+    devkind=devkind if devkind is not None else None)
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 136, in get_xla_supported_devices
+    xla_devices = _DEVICES.value
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/utils/utils.py", line 32, in value
+    self._value = self._gen_fn()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 18, in <lambda>
+    _DEVICES = xu.LazyProperty(lambda: torch_xla._XLAC._xla_get_devices())
+RuntimeError: tensorflow/compiler/xla/xla_client/computation_client.cc:274 : Missing XLA configuration
+
+(torch-xla-1.7) jungsublim@pytorch-tpu:~/torch-playground/once-for-all/tests$ ^C
+(torch-xla-1.7) jungsublim@pytorch-tpu:~/torch-playground/once-for-all/tests$ gcloud compute tpus create torch-tpu \
+> --zone=us-central1-f \
+> --network=default \
+> --version=pytorch-1.7 \
+> --accelerator-type=v2-8
+Create request issued for: [torch-tpu]
+Waiting for operation [projects/driven-seer-287602/locations/us-central1-f/operations/operation-1612498617506-5ba8f174c1af8-22dc1cb5-ad7a415d] to complete...done.
+Created tpu [torch-tpu].
+(torch-xla-1.7) jungsublim@pytorch-tpu:~/torch-playground/once-for-all/tests$ export TPU_IP_ADDRESS=10.24.112.34; \
+> export XRT_TPU_CONFIG="tpu_worker;0;$TPU_IP_ADDRESS:8470"
+(torch-xla-1.7) jungsublim@pytorch-tpu:~/torch-playground/once-for-all/tests$ echo $XRT_TPU_CONFIG
+tpu_worker;0;10.24.112.34:8470
+(torch-xla-1.7) jungsublim@pytorch-tpu:~/torch-playground/once-for-all/tests$ python test_tpu.py
+Exception in device=TPU:2: tensorflow/compiler/xla/xla_client/mesh_service.cc:316 : Check failed: impl_->channel->WaitForConnected( std::chrono::system_clock::now() + std::chrono::seconds(connect_wait_seconds))
+*** Begin stack trace ***
+        tensorflow::CurrentStackTrace()
+        xla::service::MeshClient::MeshClient(std::string const&)
+        xla::service::MeshClient::Get()
+        xla::ComputationClient::Create()
+
+
+        xla::ComputationClient::Get()
+
+
+        _PyCFunction_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+
+        _PyObject_GenericGetAttrWithDict
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        _PyFunction_FastCallDict
+        _PyObject_FastCallDict
+        _PyObject_Call_Prepend
+        PyObject_Call
+
+
+        _PyObject_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+        PyEval_EvalCode
+
+        PyRun_FileExFlags
+        PyRun_SimpleFileExFlags
+        Py_Main
+        main
+        __libc_start_main
+
+*** End stack trace ***
+Failed to connect to client mesh master: pytorch-tpu.us-central1-f.c.driven-seer-287602.internal:45315
+Exception in device=TPU:1: tensorflow/compiler/xla/xla_client/mesh_service.cc:316 : Check failed: impl_->channel->WaitForConnected( std::chrono::system_clock::now() + std::chrono::seconds(connect_wait_seconds))
+*** Begin stack trace ***
+        tensorflow::CurrentStackTrace()
+        xla::service::MeshClient::MeshClient(std::string const&)
+        xla::service::MeshClient::Get()
+        xla::ComputationClient::Create()
+
+
+        xla::ComputationClient::Get()
+
+
+        _PyCFunction_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+
+        _PyObject_GenericGetAttrWithDict
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        _PyFunction_FastCallDict
+        _PyObject_FastCallDict
+        _PyObject_Call_Prepend
+        PyObject_Call
+
+
+        _PyObject_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+        PyEval_EvalCode
+
+        PyRun_FileExFlags
+        PyRun_SimpleFileExFlags
+        Py_Main
+        main
+        __libc_start_main
+
+*** End stack trace ***
+Failed to connect to client mesh master: pytorch-tpu.us-central1-f.c.driven-seer-287602.internal:45315
+Traceback (most recent call last):
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 330, in _mp_start_fn
+    _start_fn(index, pf_cfg, fn, args)
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 323, in _start_fn
+    _setup_replication()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 315, in _setup_replication
+    device = xm.xla_device()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 231, in xla_device
+    devkind=devkind if devkind is not None else None)
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 136, in get_xla_supported_devices
+    xla_devices = _DEVICES.value
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/utils/utils.py", line 32, in value
+    self._value = self._gen_fn()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 18, in <lambda>
+    _DEVICES = xu.LazyProperty(lambda: torch_xla._XLAC._xla_get_devices())
+RuntimeError: tensorflow/compiler/xla/xla_client/mesh_service.cc:316 : Check failed: impl_->channel->WaitForConnected( std::chrono::system_clock::now() + std::chrono::seconds(connect_wait_seconds))
+*** Begin stack trace ***
+        tensorflow::CurrentStackTrace()
+        xla::service::MeshClient::MeshClient(std::string const&)
+        xla::service::MeshClient::Get()
+        xla::ComputationClient::Create()
+
+
+        xla::ComputationClient::Get()
+
+
+        _PyCFunction_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+
+        _PyObject_GenericGetAttrWithDict
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        _PyFunction_FastCallDict
+        _PyObject_FastCallDict
+        _PyObject_Call_Prepend
+        PyObject_Call
+
+
+        _PyObject_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+        PyEval_EvalCode
+
+        PyRun_FileExFlags
+        PyRun_SimpleFileExFlags
+        Py_Main
+        main
+        __libc_start_main
+
+*** End stack trace ***
+Failed to connect to client mesh master: pytorch-tpu.us-central1-f.c.driven-seer-287602.internal:45315
+Traceback (most recent call last):
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 330, in _mp_start_fn
+    _start_fn(index, pf_cfg, fn, args)
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 323, in _start_fn
+    _setup_replication()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 315, in _setup_replication
+    device = xm.xla_device()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 231, in xla_device
+    devkind=devkind if devkind is not None else None)
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 136, in get_xla_supported_devices
+    xla_devices = _DEVICES.value
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/utils/utils.py", line 32, in value
+    self._value = self._gen_fn()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 18, in <lambda>
+    _DEVICES = xu.LazyProperty(lambda: torch_xla._XLAC._xla_get_devices())
+RuntimeError: tensorflow/compiler/xla/xla_client/mesh_service.cc:316 : Check failed: impl_->channel->WaitForConnected( std::chrono::system_clock::now() + std::chrono::seconds(connect_wait_seconds))
+*** Begin stack trace ***
+        tensorflow::CurrentStackTrace()
+        xla::service::MeshClient::MeshClient(std::string const&)
+        xla::service::MeshClient::Get()
+        xla::ComputationClient::Create()
+
+
+        xla::ComputationClient::Get()
+
+
+        _PyCFunction_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+
+        _PyObject_GenericGetAttrWithDict
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        _PyFunction_FastCallDict
+        _PyObject_FastCallDict
+        _PyObject_Call_Prepend
+        PyObject_Call
+
+
+        _PyObject_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+        PyEval_EvalCode
+
+        PyRun_FileExFlags
+        PyRun_SimpleFileExFlags
+        Py_Main
+        main
+        __libc_start_main
+
+*** End stack trace ***
+Failed to connect to client mesh master: pytorch-tpu.us-central1-f.c.driven-seer-287602.internal:45315
+Exception in device=TPU:4: tensorflow/compiler/xla/xla_client/mesh_service.cc:316 : Check failed: impl_->channel->WaitForConnected( std::chrono::system_clock::now() + std::chrono::seconds(connect_wait_seconds))
+*** Begin stack trace ***
+        tensorflow::CurrentStackTrace()
+        xla::service::MeshClient::MeshClient(std::string const&)
+        xla::service::MeshClient::Get()
+        xla::ComputationClient::Create()
+
+
+        xla::ComputationClient::Get()
+
+
+        _PyCFunction_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+
+        _PyObject_GenericGetAttrWithDict
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        _PyFunction_FastCallDict
+        _PyObject_FastCallDict
+        _PyObject_Call_Prepend
+        PyObject_Call
+
+
+        _PyObject_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+        PyEval_EvalCode
+
+        PyRun_FileExFlags
+        PyRun_SimpleFileExFlags
+        Py_Main
+        main
+        __libc_start_main
+
+*** End stack trace ***
+Failed to connect to client mesh master: pytorch-tpu.us-central1-f.c.driven-seer-287602.internal:45315
+Traceback (most recent call last):
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 330, in _mp_start_fn
+    _start_fn(index, pf_cfg, fn, args)
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 323, in _start_fn
+    _setup_replication()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 315, in _setup_replication
+    device = xm.xla_device()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 231, in xla_device
+    devkind=devkind if devkind is not None else None)
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 136, in get_xla_supported_devices
+    xla_devices = _DEVICES.value
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/utils/utils.py", line 32, in value
+    self._value = self._gen_fn()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 18, in <lambda>
+    _DEVICES = xu.LazyProperty(lambda: torch_xla._XLAC._xla_get_devices())
+RuntimeError: tensorflow/compiler/xla/xla_client/mesh_service.cc:316 : Check failed: impl_->channel->WaitForConnected( std::chrono::system_clock::now() + std::chrono::seconds(connect_wait_seconds))
+*** Begin stack trace ***
+        tensorflow::CurrentStackTrace()
+        xla::service::MeshClient::MeshClient(std::string const&)
+        xla::service::MeshClient::Get()
+        xla::ComputationClient::Create()
+
+
+        xla::ComputationClient::Get()
+
+
+        _PyCFunction_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+
+        _PyObject_GenericGetAttrWithDict
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        _PyFunction_FastCallDict
+        _PyObject_FastCallDict
+        _PyObject_Call_Prepend
+        PyObject_Call
+
+
+        _PyObject_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+        PyEval_EvalCode
+
+        PyRun_FileExFlags
+        PyRun_SimpleFileExFlags
+        Py_Main
+        main
+        __libc_start_main
+
+*** End stack trace ***
+Failed to connect to client mesh master: pytorch-tpu.us-central1-f.c.driven-seer-287602.internal:45315
+Exception in device=TPU:5: tensorflow/compiler/xla/xla_client/mesh_service.cc:316 : Check failed: impl_->channel->WaitForConnected( std::chrono::system_clock::now() + std::chrono::seconds(connect_wait_seconds))
+*** Begin stack trace ***
+        tensorflow::CurrentStackTrace()
+        xla::service::MeshClient::MeshClient(std::string const&)
+        xla::service::MeshClient::Get()
+        xla::ComputationClient::Create()
+
+
+        xla::ComputationClient::Get()
+
+
+        _PyCFunction_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+
+        _PyObject_GenericGetAttrWithDict
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        _PyFunction_FastCallDict
+        _PyObject_FastCallDict
+        _PyObject_Call_Prepend
+        PyObject_Call
+
+
+        _PyObject_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+        PyEval_EvalCode
+
+        PyRun_FileExFlags
+        PyRun_SimpleFileExFlags
+        Py_Main
+        main
+        __libc_start_main
+
+*** End stack trace ***
+Failed to connect to client mesh master: pytorch-tpu.us-central1-f.c.driven-seer-287602.internal:45315
+Traceback (most recent call last):
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 330, in _mp_start_fn
+    _start_fn(index, pf_cfg, fn, args)
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 323, in _start_fn
+    _setup_replication()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 315, in _setup_replication
+    device = xm.xla_device()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 231, in xla_device
+    devkind=devkind if devkind is not None else None)
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 136, in get_xla_supported_devices
+    xla_devices = _DEVICES.value
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/utils/utils.py", line 32, in value
+    self._value = self._gen_fn()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 18, in <lambda>
+    _DEVICES = xu.LazyProperty(lambda: torch_xla._XLAC._xla_get_devices())
+RuntimeError: tensorflow/compiler/xla/xla_client/mesh_service.cc:316 : Check failed: impl_->channel->WaitForConnected( std::chrono::system_clock::now() + std::chrono::seconds(connect_wait_seconds))
+*** Begin stack trace ***
+        tensorflow::CurrentStackTrace()
+        xla::service::MeshClient::MeshClient(std::string const&)
+        xla::service::MeshClient::Get()
+        xla::ComputationClient::Create()
+
+
+        xla::ComputationClient::Get()
+
+
+        _PyCFunction_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+
+        _PyObject_GenericGetAttrWithDict
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        _PyFunction_FastCallDict
+        _PyObject_FastCallDict
+        _PyObject_Call_Prepend
+        PyObject_Call
+
+
+        _PyObject_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+        PyEval_EvalCode
+
+        PyRun_FileExFlags
+        PyRun_SimpleFileExFlags
+        Py_Main
+        main
+        __libc_start_main
+
+*** End stack trace ***
+Failed to connect to client mesh master: pytorch-tpu.us-central1-f.c.driven-seer-287602.internal:45315
+Exception in device=TPU:6: tensorflow/compiler/xla/xla_client/mesh_service.cc:316 : Check failed: impl_->channel->WaitForConnected( std::chrono::system_clock::now() + std::chrono::seconds(connect_wait_seconds))
+*** Begin stack trace ***
+        tensorflow::CurrentStackTrace()
+        xla::service::MeshClient::MeshClient(std::string const&)
+        xla::service::MeshClient::Get()
+        xla::ComputationClient::Create()
+
+
+        xla::ComputationClient::Get()
+
+
+        _PyCFunction_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+
+        _PyObject_GenericGetAttrWithDict
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        _PyFunction_FastCallDict
+        _PyObject_FastCallDict
+        _PyObject_Call_Prepend
+        PyObject_Call
+
+
+        _PyObject_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+        PyEval_EvalCode
+
+        PyRun_FileExFlags
+        PyRun_SimpleFileExFlags
+        Py_Main
+        main
+        __libc_start_main
+
+*** End stack trace ***
+Failed to connect to client mesh master: pytorch-tpu.us-central1-f.c.driven-seer-287602.internal:45315
+Traceback (most recent call last):
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 330, in _mp_start_fn
+    _start_fn(index, pf_cfg, fn, args)
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 323, in _start_fn
+    _setup_replication()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 315, in _setup_replication
+    device = xm.xla_device()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 231, in xla_device
+    devkind=devkind if devkind is not None else None)
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 136, in get_xla_supported_devices
+    xla_devices = _DEVICES.value
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/utils/utils.py", line 32, in value
+    self._value = self._gen_fn()
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 18, in <lambda>
+    _DEVICES = xu.LazyProperty(lambda: torch_xla._XLAC._xla_get_devices())
+RuntimeError: tensorflow/compiler/xla/xla_client/mesh_service.cc:316 : Check failed: impl_->channel->WaitForConnected( std::chrono::system_clock::now() + std::chrono::seconds(connect_wait_seconds))
+*** Begin stack trace ***
+        tensorflow::CurrentStackTrace()
+        xla::service::MeshClient::MeshClient(std::string const&)
+        xla::service::MeshClient::Get()
+        xla::ComputationClient::Create()
+
+
+        xla::ComputationClient::Get()
+
+
+        _PyCFunction_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+
+        _PyObject_GenericGetAttrWithDict
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+
+        PyObject_Call
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        _PyFunction_FastCallDict
+        _PyObject_FastCallDict
+        _PyObject_Call_Prepend
+        PyObject_Call
+
+
+        _PyObject_FastCallDict
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+
+        _PyEval_EvalFrameDefault
+
+
+        _PyEval_EvalFrameDefault
+        PyEval_EvalCodeEx
+        PyEval_EvalCode
+
+        PyRun_FileExFlags
+        PyRun_SimpleFileExFlags
+        Py_Main
+        main
+        __libc_start_main
+
+*** End stack trace ***
+Failed to connect to client mesh master: pytorch-tpu.us-central1-f.c.driven-seer-287602.internal:45315
+Traceback (most recent call last):
+  File "test_tpu.py", line 205, in <module>
+    test_multiple_tpu_mnist()
+  File "test_tpu.py", line 200, in test_multiple_tpu_mnist
+    start_method='fork')
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/distributed/xla_multiprocessing.py", line 395, in spawn
+    start_method=start_method)
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch/multiprocessing/spawn.py", line 157, in start_processes
+    while not context.join():
+  File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch/multiprocessing/spawn.py", line 112, in join
+    (error_index, exitcode)
+Exception: process 1 terminated with exit code 17
