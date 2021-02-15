@@ -1,5 +1,4 @@
 from tpu_data_provider import BaseInputPipeline, RandomSizedCocoDataProvider
-from ofa.utils.my_dataloader import MyRandomResizedCrop
 
 class TestInputPipeline:
 
@@ -18,8 +17,8 @@ class TestInputPipeline:
         # copied from once-for-all/ofa/imagenet_classification/elastic_nn/training/progressive_shrinking.py
         data_provider = RandomSizedCocoDataProvider()
         for i, (images, labels) in enumerate(data_provider.train):
-            # MyRandomResizedCrop.BATCH = i
             assert len(images.shape) == 4
+            break
 
     def test_active_img_size(self):
 
@@ -27,7 +26,6 @@ class TestInputPipeline:
         img_size = [128, 160, 192, 224]
         data_provider = RandomSizedCocoDataProvider(image_size=img_size)
         for i, (images, labels) in enumerate(data_provider.train):
-            MyRandomResizedCrop.BATCH = i  # 이건 어디서 사용되는걸까..
             lengths.add(images.shape[2])
             if i == 10:
                 assert len(lengths) > 2  # 랜덤하게 잘 나왔다는 걸 어떻게 보여줄까...

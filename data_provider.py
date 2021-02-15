@@ -79,7 +79,6 @@ class BaseInputPipeline:
 # International Conference on Learning Representations (ICLR), 2020.
 
 import warnings
-import os
 import math
 import numpy as np
 import torch.utils.data
@@ -88,9 +87,6 @@ import torchvision.datasets as datasets
 
 from ofa.imagenet_classification.data_providers.base_provider import DataProvider
 from ofa.utils.my_dataloader import MyRandomResizedCrop, MyDistributedSampler
-
-# import torch_xla.distributed.xla_multiprocessing as xmp
-# SERIAL_EXEC = xmp.MpSerialExecutor()
 
 class RandomSizedCocoDataProvider(DataProvider):
     def __init__(self, save_path=None, train_batch_size=256, test_batch_size=512, valid_size=None, n_worker=32,
@@ -126,7 +122,6 @@ class RandomSizedCocoDataProvider(DataProvider):
 
         train_dataset = datasets.CIFAR100(root='./data', train=True, download=True,
                                           transform=self.build_train_transform())
-        # train_dataset = SERIAL_EXEC.run(lambda: train_dataset)
         # build train, valid datasets
         if valid_size is not None:
             if not isinstance(valid_size, int):
@@ -134,7 +129,6 @@ class RandomSizedCocoDataProvider(DataProvider):
                 valid_size = int(len(train_dataset) * valid_size)
 
             valid_dataset = self.train_dataset(valid_transforms)
-            # valid_dataset = SERIAL_EXEC.run(lambda: valid_dataset)
 
             train_indexes, valid_indexes = self.random_sample_valid_set(len(train_dataset), valid_size)
 
@@ -168,7 +162,6 @@ class RandomSizedCocoDataProvider(DataProvider):
 
 
         test_dataset = self.test_dataset(valid_transforms)
-        # test_dataset = SERIAL_EXEC.run(lambda: test_dataset)
         if num_replicas is not None:
             test_sampler = torch.utils.data.distributed.DistributedSampler(test_dataset, num_replicas, rank)
             self.test = torch.utils.data.DataLoader(
@@ -184,7 +177,7 @@ class RandomSizedCocoDataProvider(DataProvider):
 
     @staticmethod
     def name():
-        return 'CoCoCPU'
+        return 'CoCo'
 
     @property
     def data_shape(self):
@@ -192,7 +185,7 @@ class RandomSizedCocoDataProvider(DataProvider):
 
     @property
     def n_classes(self):
-        return 1000
+        return 100
 
     # @property
     # def save_path(self):

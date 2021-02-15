@@ -149,11 +149,6 @@ def test_tpu_train_loop():
     print(f"top1 acc = {train_top1}")
 
 
-def test_multple_tpu_train_loop():
-    xmp.spawn(_mp_fn, args=(FLAGS,), nprocs=FLAGS['num_cores'],
-              start_method='fork')
-
-
 def test_save_model():
     pass
 

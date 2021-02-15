@@ -20,8 +20,8 @@ Traceback (most recent call last):
   File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch/multiprocessing/spawn.py", line 19, in _wrap
     fn(i, *args)
   File "/home/jungsublim/torch-playground/once-for-all/tests/test_tpu.py", line 190, in _mp_fn
-    accuracy, data, pred, target = train_mnist()
-  File "/home/jungsublim/torch-playground/once-for-all/tests/test_tpu.py", line 134, in train_mnist
+    accuracy, data, pred, target = train()
+  File "/home/jungsublim/torch-playground/once-for-all/tests/test_tpu.py", line 134, in train
     device = xm.xla_device()
   File "/anaconda3/envs/torch-xla-1.7/lib/python3.6/site-packages/torch_xla/core/xla_model.py", line 231, in xla_device
     devkind=devkind if devkind is not None else None)

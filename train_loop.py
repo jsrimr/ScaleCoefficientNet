@@ -8,9 +8,7 @@ import random
 import time
 
 import torch
-import torch.backends.cudnn as cudnn
 import torch.nn as nn
-import torch.nn.functional as F
 from tqdm import tqdm
 
 from ofa.utils import DistributedMetric, list_mean, get_net_info, accuracy, AverageMeter, mix_labels, mix_images
@@ -41,9 +39,9 @@ class RunConfig:
         self.opt_param = opt_param
         self.weight_decay = weight_decay
         self.label_smoothing = label_smoothing
-        self.no_decay_keys = no_decay_keys # todo: 이게 뭘까
+        self.no_decay_keys = no_decay_keys  # todo: 이게 뭘까
 
-        self.mixup_alpha = mixup_alpha # todo : 호 이게 그 유명한 mixup 기법인가
+        self.mixup_alpha = mixup_alpha  # todo : 호 이게 그 유명한 mixup 기법인가
 
         self.model_init = model_init
         self.validation_frequency = validation_frequency
@@ -103,7 +101,9 @@ class RunConfig:
         return build_optimizer(net_params,
                                self.opt_type, self.opt_param, self.init_lr, self.weight_decay, self.no_decay_keys)
 
+
 from data_provider import RandomSizedCocoDataProvider
+
 
 class DistributedRunConfig(RunConfig):
 
@@ -135,7 +135,7 @@ class DistributedRunConfig(RunConfig):
             else:
                 raise NotImplementedError
 
-            #todo : distort_color 를 "tf" 로 그대로 놔두는게 맞나?
+            # todo : distort_color 를 "tf" 로 그대로 놔두는게 맞나?
             self.__dict__['_data_provider'] = DataProviderClass(
                 train_batch_size=self.train_batch_size, test_batch_size=self.test_batch_size,
                 valid_size=self.valid_size, n_worker=self.n_worker, resize_scale=self.resize_scale,
@@ -363,7 +363,6 @@ class DistributedRunManager:
                       disable=no_logs or not self.is_root) as t:
                 for i, (images, labels) in enumerate(data_loader):
                     # images, labels = images.cuda(), labels.cuda()
-                    # images, labels = images.to(d), labels.to(d)
                     # compute output
                     output = net(images)
                     loss = self.test_criterion(output, labels)
@@ -476,7 +475,7 @@ class DistributedRunManager:
                 break
 
         # return losses.avg.item()#, self.get_metric_vals(metric_dict)
-        return losses.avg#, self.get_metric_vals(metric_dict)
+        return losses.avg  # , self.get_metric_vals(metric_dict)
 
     def train(self, args, warmup_epochs=5, warmup_lr=0):
         for epoch in range(self.start_epoch, self.run_config.n_epochs + warmup_epochs):
